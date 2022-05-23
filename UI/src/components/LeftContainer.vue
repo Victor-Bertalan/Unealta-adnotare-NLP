@@ -28,8 +28,10 @@ export default {
     display: flex;
     flex-direction: column;
     position: absolute;
+    left:0px;
+    top:0px;
     height: 100vh;
-    width: 33vw;
+    width: 25vw;
     background-color: #003049;
 }
 #info{
