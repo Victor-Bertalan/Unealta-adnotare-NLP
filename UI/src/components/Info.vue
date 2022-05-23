@@ -11,8 +11,8 @@ export default {
 <template>
     <div id="container">
         <h2>Info</h2>
-        <h3>DATASET: {{dataset}}</h3>
-        <h3>MODEL: {{model}}</h3>
+        <h4>DATASET: {{dataset}}</h4>
+        <h4>MODEL: {{model}}</h4>
         <q-separator inset />
     </div>
 </template>
