@@ -1,19 +1,22 @@
 <template>
   <v-app>
     <v-main>
-      <HelloWorld/>
+      <LeftContainer />
+      <RightContainer /> 
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import LeftContainer from './components/LeftContainer.vue'
+import RightContainer from './components/RightContainer.vue'
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
+    LeftContainer,
+    RightContainer
   },
 
   data: () => ({
