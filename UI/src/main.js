@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import { loadFonts } from './plugins/webfontloader'
+import { Quasar } from 'quasar'
+import quasarUserOptions from './quasar-user-options'
 
-loadFonts()
-
-createApp(App)
-  .mount('#app')
+createApp(App).use(Quasar, quasarUserOptions)
+    .use(Quasar,{})
+    .mount('#app')

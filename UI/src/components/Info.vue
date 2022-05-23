@@ -13,15 +13,13 @@ export default {
         <h2>Info</h2>
         <h3>DATASET: {{dataset}}</h3>
         <h3>MODEL: {{model}}</h3>
-        <v-divider inset></v-divider>
+        <q-separator inset />
     </div>
-    
 </template>
 
 <style scoped>
 div{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding:2vw;
     color:#FFFFFF;
 }
 </style>
