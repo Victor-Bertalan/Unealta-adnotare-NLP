@@ -1,19 +1,19 @@
 
 <script>
 export default {
-    data(){
-        return {}
-    },
-    
+  data () {
+    return {}
+  }
 }
 </script>
 
 <template>
     <div id="container">
-        <h2>History</h2>
-        
+        <h4>Info</h4>
+        <h6>DATASET: {{dataset}}</h6>
+        <h6>MODEL: {{model}}</h6>
+        <q-separator inset />
     </div>
-    
 </template>
 
 <style scoped>

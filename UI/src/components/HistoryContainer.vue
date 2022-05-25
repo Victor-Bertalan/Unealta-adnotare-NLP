@@ -1,21 +1,16 @@
 
 <script>
 export default {
-    data(){
-        return {}
-    },
-    
+  data () {
+    return {}
+  }
 }
 </script>
 
 <template>
     <div id="container">
-        <h2>Statistics</h2>
-        <h4>THIS SESSION: {{session_nr}}</h4>
-        <h4>TOTAL: {{total_nr}}</h4>
-        <q-separator inset />
+        <h4>History</h4>
     </div>
-    
 </template>
 
 <style scoped>

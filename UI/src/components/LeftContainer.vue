@@ -1,22 +1,22 @@
 
 <script>
-import Info from './Info.vue'
-import Statistics from './Statistics.vue'
-import History from './History.vue'
+import Info from './InfoContainer.vue'
+import Statistics from './StatisticsContainer.vue'
+import History from './HistoryContainer.vue'
 export default {
-    data(){
-        return {}
-    },
-    components: {
-        Info,
-        Statistics,
-        History
-    }
+  data () {
+    return {}
+  },
+  components: {
+    Info,
+    Statistics,
+    History
+  }
 }
 </script>
 
-<template>
-    <div id="container">
+<template id='left'>
+    <div id="container" class='fixed'>
         <Info id="info"/>
         <Statistics id="stats"/>
         <History id="history"/>
@@ -34,7 +34,7 @@ export default {
     left:0px;
     top:0px;
     height: 100vh;
-    width: 25vw;
+    width: 20vw;
     background-color: #003049;
 }
 #info{
@@ -57,7 +57,22 @@ q-separator,hr{
     border-style: solid !important;
     border-color: aliceblue !important;
     background-color: aliceblue !important;
-    width:100% !important;
-    height:1px !important;
+    height: 0.1vh !important;
+}
+
+h4,h6{
+    margin:2.5vh !important;
+}
+
+h4{
+    font-size: 4vh;
+}
+
+h6{
+    font-size: 2vh;
+}
+
+.fixed{
+    position: fixed !important;
 }
 </style>

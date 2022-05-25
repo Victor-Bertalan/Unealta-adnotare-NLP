@@ -1,26 +1,14 @@
 <template>
-  <v-app>
-    <v-main>
-      <LeftContainer />
-      <RightContainer /> 
-    </v-main>
-  </v-app>
+  <router-view />
 </template>
 
 <script>
-import LeftContainer from './components/LeftContainer.vue'
-import RightContainer from './components/RightContainer.vue'
-
-export default {
+import { defineComponent } from 'vue'
+export default defineComponent({
   name: 'App',
-
-  components: {
-    LeftContainer,
-    RightContainer
-  },
-
-  data: () => ({
-    //
-  }),
-}
+  data () {
+    return {
+    }
+  }
+})
 </script>
