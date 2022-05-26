@@ -2,14 +2,14 @@
 <script>
 
 export default {
-  inject: ['history'],
+  inject: ['history', 'lenght'],
   data () {
     return {
     }
   },
   methods: {
     log () {
-      console.log(this.history)
+      console.log(this.history.value)
     }
   }
 }
@@ -20,9 +20,7 @@ export default {
         <h4 @click="log()">History</h4>
         <h6 v-for='text in history.value' :key='text'>
           <span>{{text.text}}</span>
-            {{text.answer == 'accept' ? <q-btn icon="done" color="gray"/>:(text.answer == 'reject' ?
-            <q-btn icon="close" color="red" />:
-            <q-btn icon="chevron_right" color="blue"/>)}}
+          <q-icon v-bind:name="text.answer"/>
           </h6>
     </div>
 </template>
@@ -34,13 +32,18 @@ div{
 }
 h6 span{
   display: inline-flex;
-  justify-content: center;
   max-width: 10vw;
   overflow: hidden;
   max-lines: 1;
-  height: 3.5vh;
+  white-space: nowrap;
   word-break: break-all;
 }
+h6 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 q-icon{
   font-family: Arial, Helvetica, sans-serif !important;
 }

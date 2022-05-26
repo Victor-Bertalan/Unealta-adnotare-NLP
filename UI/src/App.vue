@@ -8,16 +8,23 @@ export default defineComponent({
   name: 'App',
   data () {
     return {
-      data: []
+      len: 0
     }
   },
   provide () {
     return {
+      history: ref([]),
+      lenght: ref(this.len),
       update_history (x) {
         this.history.value = x
-        return this.history
-      },
-      history: ref([])
+        this.len = 0
+        x.forEach(() => {
+          this.len += 1
+        })
+        console.log(this.len)
+        this.lenght = ref(this.len)
+        console.log(this.lenght.value)
+      }
     }
   }
 })

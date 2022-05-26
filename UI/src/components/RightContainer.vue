@@ -11,7 +11,7 @@ export default {
       current_label: ''
     }
   },
-  inject: ['update_history', 'history'],
+  inject: ['update_history', 'history', 'lenght'],
   methods: {
     async update_text () {
       const text = await axios.get('http://localhost:3000/get_next_text')
@@ -22,7 +22,8 @@ export default {
         text: this.current_text,
         answer: val
       }
-      this.history = this.update_history((await axios.post('http://localhost:3000/send_text', message)).data)
+      this.update_history((await axios.post('http://localhost:3000/send_text', message)).data)
+      console.log(this.lenght.value)
       this.update_text()
     },
     select_label (idx, label) {
@@ -44,7 +45,7 @@ export default {
       <div id="content">
         <div id="button_group">
           <span v-for="(label, idx) in labels" :key="label">
-            <q-btn outline color="white" :ripple="false" @click="select_label(idx, label)" :class="{ active : current_label == idx }">{{label}}</q-btn>
+            <q-btn outline color="white" unelevated :ripple="false" @click="select_label(idx, label)" :class="{ active : current_label == idx }">{{label}}</q-btn>
           </span>
         </div>
         <div id="text">
@@ -52,9 +53,9 @@ export default {
         </div>
       </div>
       <div id="button_group2">
-        <q-btn @click="send_text('done')" icon="done" color="green" :ripple="false" />
-        <q-btn @click="send_text('close')" icon="close" color="red" :ripple="false" />
-        <q-btn @click="send_text('chevron_right')" icon="chevron_right" color="blue" :ripple="false" />
+        <q-btn @click="send_text('done')" icon="done" unelevated color="green" :ripple="false" />
+        <q-btn @click="send_text('close')" icon="close" unelevated color="red" :ripple="false" />
+        <q-btn @click="send_text('arrow_forward_ios')" icon="arrow_forward_ios" unelevated color="blue" :ripple="false" />
       </div>
     </div>
 </template>
