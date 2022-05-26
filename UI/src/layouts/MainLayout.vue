@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <LeftContainer/>
+    <LeftContainer />
     <RightContainer/>
   </q-layout>
 </template>
@@ -12,7 +12,6 @@ import RightContainer from 'components/RightContainer.vue'
 
 export default defineComponent({
   name: 'MainLayout',
-
   components: {
     LeftContainer,
     RightContainer

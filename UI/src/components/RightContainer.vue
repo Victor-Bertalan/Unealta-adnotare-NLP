@@ -6,25 +6,35 @@ export default {
   data () {
     return {
       labels: [],
-      current_text: ''
+      current_text: '',
+      selected_label: '',
+      current_label: ''
     }
   },
+  inject: ['update_history', 'history'],
   methods: {
     async update_text () {
       const text = await axios.get('http://localhost:3000/get_next_text')
       this.current_text = text.data
     },
     async send_text (val) {
-      await axios.post('http://localhost:3000/send_text', {
+      const message = {
         text: this.current_text,
         answer: val
-      })
+      }
+      this.history = this.update_history((await axios.post('http://localhost:3000/send_text', message)).data)
       this.update_text()
+    },
+    select_label (idx, label) {
+      this.selected_label = label
+      this.current_label = idx
+      console.log(this.current_label, this.selected_label)
     }
   },
   async mounted () {
     this.update_text()
     this.labels = (await axios.get('http://localhost:3000/get_labels')).data
+    this.selected_label = this.labels[0]
   }
 }
 </script>
@@ -33,8 +43,8 @@ export default {
     <div id="container">
       <div id="content">
         <div id="button_group">
-          <span v-for="label in labels" :key="label">
-            <q-btn outline color="white" :ripple="false">{{label}}</q-btn>
+          <span v-for="(label, idx) in labels" :key="label">
+            <q-btn outline color="white" :ripple="false" @click="select_label(idx, label)" :class="{ active : current_label == idx }">{{label}}</q-btn>
           </span>
         </div>
         <div id="text">
@@ -42,9 +52,9 @@ export default {
         </div>
       </div>
       <div id="button_group2">
-        <q-btn @click="send_text('accept')" icon="done" color="green" :ripple="false" />
-        <q-btn @click="send_text('reject')" icon="close" color="red" :ripple="false" />
-        <q-btn @click="send_text('ignore')" icon="chevron_right" color="blue" :ripple="false" />
+        <q-btn @click="send_text('done')" icon="done" color="green" :ripple="false" />
+        <q-btn @click="send_text('close')" icon="close" color="red" :ripple="false" />
+        <q-btn @click="send_text('chevron_right')" icon="chevron_right" color="blue" :ripple="false" />
       </div>
     </div>
 </template>
@@ -109,5 +119,10 @@ export default {
     color: white;
     box-shadow: none;
     font-size: 3vh;
+}
+
+.active{
+  background: #ffffff !important;
+  color:#191970 !important;
 }
 </style>

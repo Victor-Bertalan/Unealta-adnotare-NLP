@@ -34,9 +34,18 @@ fastify.get('/get_labels', async (request, reply) => {
   }
 })
 
-fastify.post('/send_text', async (request, reply) => {
+const send_text_opts = {
+  schema: {
+    querystring: {
+      text: { type: 'string' },
+      answer: { type: 'string' }
+    }
+  }
+}
+
+fastify.post('/send_text', send_text_opts , async (request, reply) => {
   const data = await request.body
-  history.push(JSON.parse(data))
+  history.push(data)
   return history
 })
 // Run the server!
