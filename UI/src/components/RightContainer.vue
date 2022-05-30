@@ -33,7 +33,8 @@ export default {
     }
   },
   async mounted () {
-    this.update_text()
+    const text = await axios.get('http://localhost:3000/get_text')
+    this.current_text = text.data
     this.labels = (await axios.get('http://localhost:3000/get_labels')).data
     this.selected_label = this.labels[0]
   }

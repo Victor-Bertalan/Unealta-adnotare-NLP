@@ -2,7 +2,7 @@
 <script>
 
 export default {
-  inject: ['history', 'lenght'],
+  inject: ['history', 'lenght', 'update_history'],
   data () {
     return {
     }

@@ -4,6 +4,7 @@
 
 <script>
 import { defineComponent, ref } from 'vue'
+
 export default defineComponent({
   name: 'App',
   data () {
@@ -21,9 +22,7 @@ export default defineComponent({
         x.forEach(() => {
           this.len += 1
         })
-        console.log(this.len)
         this.lenght = ref(this.len)
-        console.log(this.lenght.value)
       }
     }
   }
