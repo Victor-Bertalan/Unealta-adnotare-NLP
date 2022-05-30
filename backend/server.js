@@ -1,5 +1,5 @@
 const fastify = require('fastify')({ logger: true })
-const texts = require('./dataset/format.js')
+const texts = require('./dataset/train.json')
 const labels = ['Label 1', 'Label 2', 'Label 3']
 let idx = 0
 let history = []

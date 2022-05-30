@@ -6,7 +6,7 @@ export default {
   data () {
     return {
       labels: [],
-      current_text: '',
+      current_text: {},
       selected_label: '',
       current_label: ''
     }
@@ -14,6 +14,7 @@ export default {
   inject: ['update_history', 'history', 'lenght'],
   methods: {
     async update_text () {
+      this.current_text = {}
       const text = await axios.get('http://localhost:3000/get_next_text')
       this.current_text = text.data
     },
@@ -50,7 +51,9 @@ export default {
           </span>
         </div>
         <div id="text">
-          {{current_text}}
+          <span v-for="(token, idx) in current_text.tokens" :key="token">
+            {{token }}{{current_text.space_after[idx]?' ':''}}
+          </span>
         </div>
       </div>
       <div id="button_group2">
