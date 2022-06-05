@@ -14,8 +14,13 @@ export default defineComponent({
   },
   provide () {
     return {
+      file: ref({}),
       history: ref([]),
       lenght: ref(this.len),
+      upload_file (f) {
+        this.file.value = f
+        console.log(this.file)
+      },
       update_history (x) {
         this.history.value = x
         this.len = 0

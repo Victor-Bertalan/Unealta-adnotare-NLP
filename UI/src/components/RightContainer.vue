@@ -8,7 +8,8 @@ export default {
       labels: [],
       current_text: {},
       selected_label: '',
-      current_label: ''
+      current_label: '',
+      freeze_flag: true
     }
   },
   inject: ['update_history', 'history', 'lenght'],
@@ -19,13 +20,17 @@ export default {
       this.current_text = text.data
     },
     async send_text (val) {
-      const message = {
-        text: this.current_text,
-        answer: val
+      if (!this.freeze_flag) {
+        this.freeze_flag = true
+        setTimeout(() => { this.freeze_flag = false }, 1000)
+        const message = {
+          text: this.current_text,
+          answer: val
+        }
+        this.update_history((await axios.post('http://localhost:3000/send_text', message)).data)
+        console.log(this.lenght.value)
+        this.update_text()
       }
-      this.update_history((await axios.post('http://localhost:3000/send_text', message)).data)
-      console.log(this.lenght.value)
-      this.update_text()
     },
     select_label (idx, label) {
       this.selected_label = label
@@ -38,6 +43,7 @@ export default {
     this.current_text = text.data
     this.labels = (await axios.get('http://localhost:3000/get_labels')).data
     this.selected_label = this.labels[0]
+    setTimeout(() => { this.freeze_flag = false }, 1000)
   }
 }
 </script>
@@ -57,9 +63,9 @@ export default {
         </div>
       </div>
       <div id="button_group2">
-        <q-btn @click="send_text('done')" icon="done" unelevated color="green" :ripple="false" />
-        <q-btn @click="send_text('close')" icon="close" unelevated color="red" :ripple="false" />
-        <q-btn @click="send_text('arrow_forward_ios')" icon="arrow_forward_ios" unelevated color="blue" :ripple="false" />
+        <q-btn disable='freeze_flg' @click="send_text('done')" icon="done" unelevated color="green" :ripple="false" />
+        <q-btn disable='freeze_flag' @click="send_text('close')" icon="close" unelevated color="red" :ripple="false" />
+        <q-btn disable='freeze_flag' @click="send_text('arrow_forward_ios')" icon="arrow_forward_ios" unelevated color="blue" :ripple="false" />
       </div>
     </div>
 </template>
