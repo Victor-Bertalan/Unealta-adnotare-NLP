@@ -1,24 +1,37 @@
 <script>
+import axios from 'axios'
+// import { ref } from '@vue/reactivity'
 export default {
-  inject: ['file', 'upload_file'],
+  inject: ['uploaded_files'],
   data  () {
-    return {}
+    return {
+      ds_name: '',
+      model_name: '',
+      ds_file: '',
+      model_file: {}
+    }
   },
   methods: {
-    readFile (file) {
+    log () {
+      const new_file = this.$refs.dataset.files[0]
+      this.ds_name = this.$refs.dataset.files[0].name
       const reader = new FileReader()
-      reader.onload = e => {
-        const json = JSON.parse(e.target.result)
-        console.log(json)
-        this.file.content = json
-      }
-      reader.readAsText(file)
+      reader.onload = async ({ target: { result } }) => { await axios.post('http://localhost:3000/set_dataset', JSON.parse(result)) }
+      reader.readAsText(new_file)
+      console.log(this.ds_file)
     },
-    log (event) {
-      const new_file = event.target.files[0]
-      this.file.name = event.target.files[0].name
-      this.readFile(new_file)
-      console.log(this.file)
+    async send_files () {
+      const message = {
+        dataset: this.dataset,
+        model: this.dataset
+      }
+      const rep = await axios.post('http://localhost:3000/set_files', message)
+      this.uploaded_files = true
+      console.log(rep)
+      location.reload()
+    },
+    send_model () {
+
     }
   }
 }
@@ -33,24 +46,13 @@ export default {
             Upload dataset file
           </h4>
           <div>
-            <input type="file" id="dataset" class="file">
+            <input type="file" id="dataset" ref="dataset" class="file" @change="log()">
             <label for="dataset">
-              <q-btn onclick="document.getElementById('model').click()" style="background-color:#191970;color:white" unelevated >Select file &nbsp; &nbsp; <q-icon name="file_upload"/></q-btn>
-              </label>
-          </div>
-        </div>
-        <div class="file-input">
-          <h4>
-            Upload model
-          </h4>
-          <div>
-            <input type="file" id="model" class="file">
-            <label for="model">
-              <q-btn onclick="document.getElementById('model').click()" style="background-color:#191970;color:white" unelevated >Select file &nbsp; &nbsp; <q-icon name="file_upload"/></q-btn>
+              <q-btn onclick="document.getElementById('dataset').click()" style="background-color:#191970;color:white" unelevated >Select file &nbsp; &nbsp; <q-icon name="file_upload"/></q-btn>
             </label>
           </div>
+          {{ds_name}}
         </div>
-        <q-btn id="custom" color='green' icon-right='done_all' unelevated label='Use custom dataset and model'/>
       </div>
       <q-separator id="#separator" vertical inset />
       <q-btn id="defaults" color='blue' icon-right='assignment' unelevated label='Use demo defaults'/>
