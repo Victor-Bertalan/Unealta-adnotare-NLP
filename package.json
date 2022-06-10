@@ -1,0 +1,17 @@
+{
+  "name": "adnotation-cli",
+  "version": "1.0.0",
+  "description": "Adnotation CLI",
+  "bin": {
+    "adnotate": "./bin/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "commander": "^5.1.0",
+    "inquirer": "^7.1.0",
+    "open": "^7.0.4",
+    "pad": "^3.2.0"
+  }
+}

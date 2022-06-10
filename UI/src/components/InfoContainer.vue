@@ -1,8 +1,18 @@
 
 <script>
+import axios from 'axios'
 export default {
   data () {
-    return {}
+    return {
+      ds_name: '',
+      model_name: ''
+    }
+  },
+  async mounted () {
+    const names = await axios.get('http://localhost:3000/get_names')
+    console.log(names)
+    this.ds_name = names.data.dataset
+    this.model_name = names.data.model
   }
 }
 </script>
@@ -10,8 +20,8 @@ export default {
 <template>
     <div id="container">
         <h4>Info</h4>
-        <h6>DATASET: {{dataset}}</h6>
-        <h6>MODEL: {{model}}</h6>
+        <h6>DATASET: {{ds_name}}</h6>
+        <h6>MODEL: {{model_name}}</h6>
         <q-separator inset />
     </div>
 </template>

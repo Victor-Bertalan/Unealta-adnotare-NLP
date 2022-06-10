@@ -104,6 +104,7 @@ export default {
 
 #button_group {
   display: flex;
+  flex-wrap: wrap;
   width: 60vw;
   padding: 2vh;
   background: #191970;
@@ -111,7 +112,8 @@ export default {
 }
 
 #button_group .q-btn {
-  margin: 0 0.5vw !important;
+  margin: 0.25vh 0.25vw !important;
+  padding: 0 0.5vw;
   color: white;
 }
 
