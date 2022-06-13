@@ -20,9 +20,7 @@ export default {
         <div class='history_text'>
           <h6 v-for='text in current_history' :key='text'>
             <div>
-              <span v-for='(token, idx) in text.text.tokens' :key="token">
-                {{token}}{{text.text.space_after[idx]?' ':''}}
-              </span>
+             {{text.text}}
             </div>
             <q-icon v-bind:name="text.answer"/>
           </h6>

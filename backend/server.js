@@ -13,15 +13,14 @@ let dataset_name = ''
 const files = fs.readdirSync(text_path)
 
 files.forEach(file => {
-  if (file.endsWith('.json')) dataset_name = file
+  if (file.endsWith('model_output.json')) dataset_name = file
   if (file.endsWith('.py')) model_name = file
 })
-console.log(dataset_name)
 
 const texts = require(text_path + dataset_name)
-for (let entry of texts)
-  for(let tag of entry.ner_tags)
-    if (!labels.includes(tag)) labels.push(tag)
+for (let entry of Object.values(texts))
+  for(let tag of Object.values(entry))
+    if (!labels.includes(tag[3])) labels.push(tag[3])
 
 fastify.register(require('fastify-cors'), {
 })
@@ -48,10 +47,10 @@ fastify.get('/get_model', async (request, reply) => {
 
 fastify.get('/get_text', async (request, reply) => {
   try {
-    if (!texts[idx]) {
+    if (!Object.entries(texts)[idx]) {
       throw new Error('No more examples')
     }
-    return texts[idx]
+    return Object.entries(texts)[idx]
   } catch (e) {
     return e.message
   }
@@ -60,10 +59,10 @@ fastify.get('/get_text', async (request, reply) => {
 fastify.get('/get_next_text', async (request, reply) => {
   idx += 1
   try {
-    if (!texts[idx]) {
+    if (!Object.entries(texts)[idx]) {
       throw new Error('No more examples')
     }
-    return texts[idx]
+    return Object.entries(texts)[idx]
   } catch (e) {
     return e.message
   }
@@ -93,25 +92,6 @@ fastify.post('/send_text', send_text_opts, async (request, reply) => {
   const data = await request.body
   history.push(data)
   return history
-})
-
-fastify.post('/set_dataset', async (request, reply) => {
-  dataset = await request.body.dataset
-  console.log(dataset)
-  return ({
-    model: model,
-    dataset: dataset
-  })
-})
-
-fastify.post('/set_files', async (request, reply) => {
-  console.log(request.body)
-  model = await request.body.model
-  dataset = await request.body.dataset
-  return ({
-    model: model,
-    dataset: dataset
-  })
 })
 
 fastify.get('/get_history', async (request, reply) => {

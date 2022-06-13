@@ -6,18 +6,22 @@ export default {
   data () {
     return {
       labels: [],
-      current_text: {},
+      current_text: '',
+      initial_text: '',
       selected_label: '',
       current_label: '',
-      freeze_flag: true
+      freeze_flag: true,
+      text_labels: []
     }
   },
   inject: ['update_history', 'history', 'lenght'],
   methods: {
     async update_text () {
-      this.current_text = {}
+      this.current_text = ''
       const text = await axios.get('http://localhost:3000/get_next_text')
-      this.current_text = text.data
+      this.current_text = text.data[0]
+      this.initial_text = text.data[0]
+      this.text_labels = text.data[1]
     },
     async send_text (val) {
       if (!this.freeze_flag) {
@@ -35,14 +39,44 @@ export default {
     select_label (idx, label) {
       this.selected_label = label
       this.current_label = idx
-      console.log(this.current_label, this.selected_label)
+    },
+    make_label_selection () {
+      const selected = window.getSelection().toString()
+      if (selected && selected !== ' ') {
+        this.text_labels.push([selected, this.selected_label])
+      }
+      return this.text_labels
+    },
+    remove (el) {
+      console.log(el)
+      el.remove()
+    },
+    refresh_labels () {
+      let text = this.initial_text
+      for (const l in this.text_labels) {
+        console.log(this.text_labels[l])
+        console.log(l)
+        text = this.style_label(text, this.text_labels[l][0], this.text_labels[l][1])
+      }
+      this.current_text = text
+    },
+    style_label (all_text, text, label) {
+      const str = '<span style="background-color:gold;padding:0 0.5vw">' + text + '<h5 style="display:inline;margin:0;font-size:0.75vw;vertical-align:top;font-weight:bold">' + label + '</h5></span>'
+      return all_text.replace(text, str)
     }
   },
   async mounted () {
     const text = await axios.get('http://localhost:3000/get_text')
-    this.current_text = text.data
+    this.current_text = text.data[0]
+    this.initial_text = text.data[0]
     this.labels = (await axios.get('http://localhost:3000/get_labels')).data
     this.selected_label = this.labels[0]
+    for (const entry of Object.values(text.data[1])) {
+      console.log(entry[0], entry[3])
+      this.text_labels.push([entry[0], entry[3]])
+    }
+    this.refresh_labels()
+    console.log(this.text_labels)
     setTimeout(() => { this.freeze_flag = false }, 1000)
   }
 }
@@ -56,10 +90,7 @@ export default {
             <q-btn outline color="white" unelevated :ripple="false" @click="select_label(idx, label)" :class="{ active : current_label == idx }">{{label}}</q-btn>
           </span>
         </div>
-        <div id="text">
-          <span v-for="(token, idx) in current_text.tokens" :key="token">
-            {{token }}{{current_text.space_after[idx]?' ':''}}
-          </span>
+        <div id="text" v-html='current_text' @mouseup="make_label_selection(), refresh_labels()">
         </div>
       </div>
       <div id="button_group2">
