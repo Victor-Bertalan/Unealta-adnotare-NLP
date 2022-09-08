@@ -1,31 +1,73 @@
 const fastify = require('fastify')({ logger: true, bodyLimit: 5242880 })
 const fs = require('fs');
-const text_path = '../dataset/' + process.argv[2] + '/'
+const { spawn, exec } = require('child_process')
 
+const text_path = '../custom_models_and_datasets/' + process.argv[2] + '/'
 let labels = []
 let idx = 0
 let history = []
 let dataset = {}
-
+let texts = []
 let model_name = ''
 let dataset_name = ''
 
 const files = fs.readdirSync(text_path)
 
 files.forEach(file => {
-  if (file.endsWith('model_output.json')) dataset_name = file
   if (file.endsWith('.py')) model_name = file
 })
 
-const texts = require(text_path + dataset_name)
-for (let entry of Object.values(texts))
-  for(let tag of Object.values(entry))
-    if (!labels.includes(tag[3])) labels.push(tag[3])
+const start_server = async () => {
+  try {
+
+    await fastify.listen(3000)
+
+  } catch (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+}
+
+const  start_ui = () => {
+  const UI = exec('quasar dev', { cwd: '../UI/' }, (err, stdout, stderr) => {
+    if (err) {
+      console.log(`err: ${err}`)
+    }
+    console.log(`stdout: ${stdout}`)
+    console.log(`stderr: ${stderr}`)
+  })
+
+  UI.stdout.on('data', function (data) {
+    console.log(data);
+  });
+}
+
+async function run_model() {
+  console.log('running '+ model_name) 
+  files.forEach(file => {
+    if (file.endsWith('.json')) {
+      dataset_name = file
+      
+    }
+  })
+  model_instance = spawn('python', [text_path+model_name, dataset_name], { capture: ['stdout', 'stderr', 'on'] })
+  model_instance.stdout.on('data', (data) => {
+    console.log(data)
+  })
+  
+  model_instance.on('close', () => {
+    texts = require(text_path + dataset_name)
+    start_server()
+    start_ui()
+    for (let entry of Object.values(texts))
+      for (let tag of Object.values(entry[1]))
+        if (!labels.includes(tag[1])) labels.push(tag[1])
+  })
+}
 
 fastify.register(require('fastify-cors'), {
 })
 
-fastify.decorate(dataset)
 fastify.decorate(history)
 fastify.decorate(idx)
 // Declare a route
@@ -45,6 +87,14 @@ fastify.get('/get_model', async (request, reply) => {
   return model
 })
 
+fastify.get('/save_history', (request, reply) => {
+  let history_string = JSON.stringify(history)
+  fs.writeFile("adnotation_output.json", history_string, function(err, result) {
+    if(err) console.log('error', err);
+  })
+  return true
+})
+
 fastify.get('/get_text', async (request, reply) => {
   try {
     if (!Object.entries(texts)[idx]) {
@@ -57,16 +107,16 @@ fastify.get('/get_text', async (request, reply) => {
 })
 
 fastify.get('/get_next_text', async (request, reply) => {
-  idx += 1
-  try {
-    if (!Object.entries(texts)[idx]) {
-      throw new Error('No more examples')
+    idx += 1
+    try {
+      if (!Object.entries(texts)[idx]) {
+        throw new Error('No more examples')
+      }
+      return Object.entries(texts)[idx]
+    } catch (e) {
+      return e.message
     }
-    return Object.entries(texts)[idx]
-  } catch (e) {
-    return e.message
-  }
-})
+  })
 
 fastify.get('/get_labels', async (request, reply) => {
   try {
@@ -82,7 +132,8 @@ fastify.get('/get_labels', async (request, reply) => {
 const send_text_opts = {
   schema: {
     querystring: {
-      text: { type: 'string' },
+      initial_text: { type: 'string' },
+      text: { type: "object" },
       answer: { type: 'string' }
     }
   }
@@ -98,13 +149,4 @@ fastify.get('/get_history', async (request, reply) => {
   return history
 })
 
-// Run the server!
-const start = async () => {
-  try {
-    await fastify.listen(3000)
-  } catch (err) {
-    fastify.log.error(err)
-    process.exit(1)
-  }
-}
-start()
+run_model()

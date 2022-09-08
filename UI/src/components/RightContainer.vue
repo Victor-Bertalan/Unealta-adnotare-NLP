@@ -11,23 +11,31 @@ export default {
       selected_label: '',
       current_label: '',
       freeze_flag: true,
-      text_labels: []
+      text_labels: [],
+      text_string: ''
     }
   },
   inject: ['update_history', 'history', 'lenght'],
   methods: {
+    async save () {
+      await axios.get('http://localhost:3000/save_history')
+      this.freeze_flag = true
+      setTimeout(() => { this.freeze_flag = false }, 1000)
+    },
     async update_text () {
       this.current_text = ''
       const text = await axios.get('http://localhost:3000/get_next_text')
-      this.current_text = text.data[0]
-      this.initial_text = text.data[0]
-      this.text_labels = text.data[1]
+      this.text_string = text.data[0]
+      this.current_text = Object.values(text.data[1][0])
+      this.initial_text = text.data[1][0]
+      this.text_labels = text.data[1][1]
     },
     async send_text (val) {
       if (!this.freeze_flag) {
         this.freeze_flag = true
         setTimeout(() => { this.freeze_flag = false }, 1000)
         const message = {
+          initial_text: this.text_string,
           text: this.current_text,
           answer: val
         }
@@ -40,43 +48,31 @@ export default {
       this.selected_label = label
       this.current_label = idx
     },
-    make_label_selection () {
-      const selected = window.getSelection().toString()
-      if (selected && selected !== ' ') {
-        this.text_labels.push([selected, this.selected_label])
+    label_remove (label) {
+      const idx = label[3]
+      for (const i of this.current_text) {
+        if (i[3] === idx) {
+          i[2] = false
+          i[3] = ''
+          console.log(i)
+        }
       }
-      return this.text_labels
+      delete this.text_labels[idx]
     },
-    remove (el) {
-      console.log(el)
-      el.remove()
-    },
-    refresh_labels () {
-      let text = this.initial_text
-      for (const l in this.text_labels) {
-        console.log(this.text_labels[l])
-        console.log(l)
-        text = this.style_label(text, this.text_labels[l][0], this.text_labels[l][1])
-      }
-      this.current_text = text
-    },
-    style_label (all_text, text, label) {
-      const str = '<span style="background-color:gold;padding:0 0.5vw">' + text + '<h5 style="display:inline;margin:0;font-size:0.75vw;vertical-align:top;font-weight:bold">' + label + '</h5></span>'
-      return all_text.replace(text, str)
+    add_label (label, idx) {
+      this.current_text[idx][2] = true
+      this.current_text[idx][3] = Object.keys(this.text_labels).length
+      this.text_labels[Object.keys(this.text_labels).length] = [this.current_text[idx], this.selected_label, idx, idx + 1]
     }
   },
   async mounted () {
     const text = await axios.get('http://localhost:3000/get_text')
-    this.current_text = text.data[0]
-    this.initial_text = text.data[0]
+    this.text_string = text.data[0]
+    this.current_text = Object.values(text.data[1][0])
+    this.initial_text = text.data[1][0]
+    this.text_labels = text.data[1][1]
     this.labels = (await axios.get('http://localhost:3000/get_labels')).data
     this.selected_label = this.labels[0]
-    for (const entry of Object.values(text.data[1])) {
-      console.log(entry[0], entry[3])
-      this.text_labels.push([entry[0], entry[3]])
-    }
-    this.refresh_labels()
-    console.log(this.text_labels)
     setTimeout(() => { this.freeze_flag = false }, 1000)
   }
 }
@@ -86,11 +82,18 @@ export default {
     <div id="container">
       <div id="content">
         <div id="button_group">
-          <span v-for="(label, idx) in labels" :key="label">
+          <span v-for="(label, idx) in labels" :key="idx">
             <q-btn outline color="white" unelevated :ripple="false" @click="select_label(idx, label)" :class="{ active : current_label == idx }">{{label}}</q-btn>
           </span>
         </div>
-        <div id="text" v-html='current_text' @mouseup="make_label_selection(), refresh_labels()">
+        <div id="text">
+          <span v-for='(label,idx) in current_text' :key="idx">
+              <span v-if='label[2]' style="background-color: gold;" @click="label_remove(label)">
+                {{label[0]+label[1]}}
+                <span style="font-size:50%;vertical-align:text-top;" v-if='current_text[idx][3] !== current_text[idx+1][3]'>{{text_labels[label[3]][1]}}</span>
+              </span>
+              <span v-else @click="add_label(label, idx)">{{label[0]+label[1]}}</span>
+          </span>
         </div>
       </div>
       <div id="button_group2">
@@ -98,6 +101,7 @@ export default {
         <q-btn disable='freeze_flag' @click="send_text('close')" icon="close" unelevated color="red" :ripple="false" />
         <q-btn disable='freeze_flag' @click="send_text('arrow_forward_ios')" icon="arrow_forward_ios" unelevated color="blue" :ripple="false" />
       </div>
+      <q-btn id='save' disable='freeze_flag' @click="save()" icon="save" unelevated color="orange" :ripple="false"></q-btn>
     </div>
 </template>
 
@@ -163,6 +167,16 @@ export default {
     color: white;
     box-shadow: none;
     font-size: 3vh;
+}
+
+#save{
+  position:absolute;
+  right: 1vw;
+  bottom: 2vh;
+  width:10vw;
+  color: white;
+  box-shadow: none;
+  font-size: 3vh;
 }
 
 .active{

@@ -20,7 +20,7 @@ export default {
         <div class='history_text'>
           <h6 v-for='text in current_history' :key='text'>
             <div>
-             {{text.text}}
+             {{text.initial_text}}
             </div>
             <q-icon v-bind:name="text.answer"/>
           </h6>

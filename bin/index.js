@@ -7,11 +7,10 @@ const browse = require('../lib/browse');
 program
   .command('start')
   .alias('s')
-  .description('Browse a topic')
+  .description('Start application and select dataset and model')
   .action(function () {
     browse()
   });
 
-// allow commander to parse `process.argv`
 program.parse(process.argv);
 
